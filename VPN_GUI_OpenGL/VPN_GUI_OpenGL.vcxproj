@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{f2bc3609-54f1-444f-9432-f9fa7ad28800}</ProjectGuid>
-    <RootNamespace>OpenGLTest</RootNamespace>
+    <ProjectGuid>{95f363f6-8ca2-4b6f-a73b-05c16e2c8af9}</ProjectGuid>
+    <RootNamespace>VPNGUIOpenGL</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -70,18 +70,53 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LibraryPath>E:\VS2022\OpenGL_Project\external\glfw\lib-vc2022;$(LibraryPath)</LibraryPath>
+    <IncludePath>E:\VS2022\OpenGL_Project\external\imgui\backends;E:\VS2022\OpenGL_Project\external\stb;E:\VS2022\OpenGL_Project\external\imgui;E:\VS2022\OpenGL_Project\external\glfw\include;E:\VS2022\OpenGL_Project\external\glad\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LibraryPath>E:\VS2022\OpenGL_Project\external\glfw\lib-vc2022;$(LibraryPath)</LibraryPath>
+    <IncludePath>E:\VS2022\OpenGL_Project\external\imgui\backends;E:\VS2022\OpenGL_Project\external\stb;E:\VS2022\OpenGL_Project\external\imgui;E:\VS2022\OpenGL_Project\external\glfw\include;E:\VS2022\OpenGL_Project\external\glad\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LibraryPath>E:\VS2022\OpenGL_Project\external\glfw\lib-vc2022;$(LibraryPath)</LibraryPath>
+    <IncludePath>E:\VS2022\OpenGL_Project\external\imgui\backends;E:\VS2022\OpenGL_Project\external\stb;E:\VS2022\OpenGL_Project\external\imgui;E:\VS2022\OpenGL_Project\external\glfw\include;E:\VS2022\OpenGL_Project\external\glad\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LibraryPath>E:\VS2022\OpenGL_Project\external\glfw\lib-vc2022;$(LibraryPath)</LibraryPath>
+    <IncludePath>E:\VS2022\OpenGL_Project\external\imgui\backends;E:\VS2022\OpenGL_Project\external\stb;E:\VS2022\OpenGL_Project\external\imgui;E:\VS2022\OpenGL_Project\external\glfw\include;E:\VS2022\OpenGL_Project\external\glad\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>IMGUI_IMPL_OPENGL_LOADER_GLAD;_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN;NOMINMAX</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>glfw3dll.lib;
+opengl32.lib;
+user32.lib;
+gdi32.lib;
+shell32.lib;
+ole32.lib;
+advapi32.lib;
+imm32.lib
+;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>if exist "$(ProjectDir)external\glfw\lib-vc2022\glfw3.dll" (
+  copy /y "$(ProjectDir)external\glfw\lib-vc2022\glfw3.dll" "$(OutDir)" &gt;nul
+) else (
+  rem 不存在就当没事发生，避免返回非 0
+)
+
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -89,35 +124,65 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>IMGUI_IMPL_OPENGL_LOADER_GLAD;_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN;NOMINMAX</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>glfw3dll.lib;
+opengl32.lib;
+user32.lib;
+gdi32.lib;
+shell32.lib;
+ole32.lib;
+advapi32.lib;
+imm32.lib
+;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>if exist "$(ProjectDir)external\glfw\lib-vc2022\glfw3.dll" (
+  copy /y "$(ProjectDir)external\glfw\lib-vc2022\glfw3.dll" "$(OutDir)" &gt;nul
+) else (
+  rem 不存在就当没事发生，避免返回非 0
+)
+
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);IMGUI_IMPL_OPENGL_LOADER_GLAD;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>IMGUI_IMPL_OPENGL_LOADER_GLAD;_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN;NOMINMAX</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>E:\VS2022\GLFW_Source\glfw-master\include;E:\VS2022\OpenGL_Project\external\stb;E:\VS2022\OpenGL_Project\external\imgui;E:\VS2022\OpenGL_Project\external\imgui\backends;E:\VS2022\OpenGL_Project\external\glfw\include;E:\VS2022\OpenGL_Project\external\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <AdditionalOptions>/utf-8
- %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>E:\VS2022\GLFW_Build\src\Debug;E:\VS2022\IDE\VC\Tools\MSVC\14.44.35207\lib\x64;E:\VS2022\OpenGL_Project\external\glfw\lib-vc2022;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;
+      <AdditionalDependencies>glfw3dll.lib;
 opengl32.lib;
-msvcrtd.lib
+user32.lib;
+gdi32.lib;
+shell32.lib;
+ole32.lib;
+advapi32.lib;
+imm32.lib
 ;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>if exist "$(ProjectDir)external\glfw\lib-vc2022\glfw3.dll" (
+  copy /y "$(ProjectDir)external\glfw\lib-vc2022\glfw3.dll" "$(OutDir)" &gt;nul
+) else (
+  rem 不存在就当没事发生，避免返回非 0
+)
+
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -125,33 +190,44 @@ msvcrtd.lib
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);IMGUI_IMPL_OPENGL_LOADER_GLAD;_CRT_SECURE_NO_WARNINGS;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
+      <PreprocessorDefinitions>IMGUI_IMPL_OPENGL_LOADER_GLAD;_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN;NOMINMAX</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>E:\VS2022\GLFW_Source\glfw-master\include;E:\VS2022\OpenGL_Project\external\stb;E:\VS2022\OpenGL_Project\external\imgui;E:\VS2022\OpenGL_Project\external\imgui\backends;E:\VS2022\OpenGL_Project\external\glfw\include;E:\VS2022\OpenGL_Project\external\glad\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
-      <AdditionalOptions>/utf-8
- %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>E:\VS2022\GLFW_Build\src\Debug;E:\VS2022\OpenGL_Project\external\glfw\lib-vc2022;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>glfw3.lib;
+      <AdditionalDependencies>glfw3dll.lib;
 opengl32.lib;
-msvcrtd.lib
+user32.lib;
+gdi32.lib;
+shell32.lib;
+ole32.lib;
+advapi32.lib;
+imm32.lib
 ;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>if exist "$(ProjectDir)external\glfw\lib-vc2022\glfw3.dll" (
+  copy /y "$(ProjectDir)external\glfw\lib-vc2022\glfw3.dll" "$(OutDir)" &gt;nul
+) else (
+  rem 不存在就当没事发生，避免返回非 0
+)
+
+</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\external\imgui\backends\imgui_impl_glfw.cpp" />
-    <ClCompile Include="..\..\..\external\imgui\backends\imgui_impl_opengl3.cpp" />
-    <ClCompile Include="..\..\..\external\imgui\imgui.cpp" />
-    <ClCompile Include="..\..\..\external\imgui\imgui_demo.cpp" />
-    <ClCompile Include="..\..\..\external\imgui\imgui_draw.cpp" />
-    <ClCompile Include="..\..\..\external\imgui\imgui_tables.cpp" />
-    <ClCompile Include="..\..\..\external\imgui\imgui_widgets.cpp" />
-    <ClCompile Include="..\..\..\src\glad.c" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="..\external\imgui\backends\imgui_impl_glfw.cpp" />
+    <ClCompile Include="..\external\imgui\backends\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="..\external\imgui\imgui.cpp" />
+    <ClCompile Include="..\external\imgui\imgui_demo.cpp" />
+    <ClCompile Include="..\external\imgui\imgui_draw.cpp" />
+    <ClCompile Include="..\external\imgui\imgui_tables.cpp" />
+    <ClCompile Include="..\external\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="..\src\glad.c" />
+    <ClCompile Include="..\src\main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

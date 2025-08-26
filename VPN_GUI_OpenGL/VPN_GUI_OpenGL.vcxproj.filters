@@ -15,31 +15,31 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="..\src\main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\glad.c">
+    <ClCompile Include="..\src\glad.c">
+      <Filter>头文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\imgui\imgui.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\external\imgui\imgui.cpp">
+    <ClCompile Include="..\external\imgui\imgui_draw.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\external\imgui\imgui_draw.cpp">
+    <ClCompile Include="..\external\imgui\imgui_widgets.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\external\imgui\imgui_widgets.cpp">
+    <ClCompile Include="..\external\imgui\imgui_tables.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\external\imgui\imgui_tables.cpp">
+    <ClCompile Include="..\external\imgui\backends\imgui_impl_glfw.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\external\imgui\imgui_demo.cpp">
+    <ClCompile Include="..\external\imgui\backends\imgui_impl_opengl3.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\external\imgui\backends\imgui_impl_glfw.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\external\imgui\backends\imgui_impl_opengl3.cpp">
+    <ClCompile Include="..\external\imgui\imgui_demo.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
