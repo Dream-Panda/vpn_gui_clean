@@ -199,7 +199,7 @@ static void DrawMainUI(AppState& app) {
     ImGui::End();
 }
 
-int main(int, char**) {
+int main(int, char**) {// test commit from VS
     if (!glfwInit()) return 1;
 
     // GL + GLSL versions
