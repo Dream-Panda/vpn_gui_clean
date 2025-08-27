@@ -5,6 +5,7 @@
 // Drop this into your existing ImGui project as main.cpp (or replace your UI render part).
 // =============================
 
+#include "vpn_logic.h"
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <backends/imgui_impl_glfw.h>

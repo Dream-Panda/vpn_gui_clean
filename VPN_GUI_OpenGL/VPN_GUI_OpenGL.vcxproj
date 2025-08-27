@@ -229,6 +229,9 @@ imm32.lib
     <ClCompile Include="..\src\glad.c" />
     <ClCompile Include="..\src\main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\vpn_logic.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
