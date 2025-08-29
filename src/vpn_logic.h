@@ -29,10 +29,10 @@ struct VpnModel {
     }
 };
 
-// ==== ¼«¼ò¡°¼Ùºó¶Ë¡± ====
-// Ë¼Â·£ºµã»÷ Connect ºó½øÈë Connecting -> 2s ºó Verifying -> 1.5s ºó Connected¡£
-// µã»÷ Disconnect ½øÈë Disconnecting -> 0.5s ºó Disconnected¡£
-// Õâ¾ÍÈÃÄãÍêÕû¿´µ½ UI <-> Âß¼­ µÄ±Õ»·£¬ºóÃæÔÙ°ÑÊ±¼äÅĞ¶¨Ìæ»»³ÉÕæÊµÊÂ¼ş¡£
+// ==== æç®€â€œå‡åç«¯â€ ====
+// æ€è·¯ï¼šç‚¹å‡» Connect åè¿›å…¥ Connecting -> 2s å Verifying -> 1.5s å Connectedã€‚
+// ç‚¹å‡» Disconnect è¿›å…¥ Disconnecting -> 0.5s å Disconnectedã€‚
+// è¿™å°±è®©ä½ å®Œæ•´çœ‹åˆ° UI <-> é€»è¾‘ çš„é—­ç¯ï¼Œåé¢å†æŠŠæ—¶é—´åˆ¤å®šæ›¿æ¢æˆçœŸå®äº‹ä»¶ã€‚
 
 inline void StartConnect(VpnModel& m) {
     if (m.state == VpnState::Disconnected || m.state == VpnState::Failed) {

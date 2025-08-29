@@ -1,269 +1,150 @@
-// =============================
-// Minimal ImGui VPN UI (single-file)
-// Target: Windows + VS2022 + GLFW + OpenGL3 + Dear ImGui
-// No real VPN logic; purely UI + a tiny state machine using glfwGetTime().
-// Drop this into your existing ImGui project as main.cpp (or replace your UI render part).
-// =============================
+// ===============================
+// main.cpp  (Minimal VPN UI + Logic via vpn_logic.h)
+// 覆盖原文件即可编译运行
+// 依赖：glad.c 已在项目中，GLFW/ImGui 已配置
+// ===============================
 
-#include "vpn_logic.h"
+#include <cstdio>
+#include <cstdlib>
+#include <string>
+#include <vector>
+#include <chrono>
+
+// ---- OpenGL / GLFW / ImGui ----
+#include <glad/glad.h>            // 确保项目里有 src/glad.c
+#include <GLFW/glfw3.h>
+
 #include <imgui.h>
 #include <imgui_internal.h>
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
-#include <GLFW/glfw3.h>
-#include <vector>
-#include <string>
 
-// ---- Tiny helper: theme ----
-static void ApplyMinimalTheme() {
-    ImGuiStyle& s = ImGui::GetStyle();
-    s.WindowRounding = 12.0f;
-    s.FrameRounding = 10.0f;
-    s.GrabRounding = 10.0f;
-    s.ScrollbarRounding = 12.0f;
-    s.TabRounding = 10.0f;
+// ---- 我们的极简逻辑层（唯一来源）----
+#include "vpn_logic.h"            // 你之前已放在 src/vpn_logic.h
+
+// 选择一个合适的 GLSL 版本字符串
+// 如果你的环境是 OpenGL3.0/3.2，使用 "#version 130" / "#version 150" 都可
+static const char* kGlslVersion = "#version 130";
+
+// 处理窗口尺寸变化（可选）
+static void glfw_error_callback(int error, const char* description) {
+    std::fprintf(stderr, "GLFW Error %d: %s\n", error, description);
 }
 
-// ---- Minimal state machine (no threads) ----
-enum class VpnState { Idle, Resolving, Connecting, Connected, Disconnecting, Error };
-
-struct AppState {
-    // Profiles
-    std::vector<std::string> profiles{ "US-West #1", "US-East #2", "CA-Vancouver", "JP-Tokyo" };
-    int selected_profile = 0;
-
-    // Options
-    bool auto_reconnect = false;
-    int reconnect_interval_sec = 15;
-
-    // Connection state
-    VpnState state = VpnState::Idle;
-    std::string status_msg = "Idle";
-    std::string assigned_ip;
-
-    // Timing for fake progress
-    double t_phase_start = 0.0; // glfwGetTime() when phase began
-
-    // Log buffer (very simple)
-    ImVector<ImVec4> log_colors; // per line color
-    ImVector<ImGuiTextBuffer> logs; // (one buffer per line for simplicity)
-
-    void Log(const char* text, ImVec4 color = ImVec4(0.8f, 0.8f, 0.8f, 1.0f)) {
-        ImGuiTextBuffer line; line.appendf("%s\n", text);
-        logs.push_back(line);
-        log_colors.push_back(color);
-    }
-};
-
-static const char* StateToText(VpnState s) {
-    switch (s) {
-    case VpnState::Idle: return "Idle";
-    case VpnState::Resolving: return "Resolving";
-    case VpnState::Connecting: return "Connecting";
-    case VpnState::Connected: return "Connected";
-    case VpnState::Disconnecting: return "Disconnecting";
-    case VpnState::Error: return "Error";
-    }
-    return "?";
-}
-
-static void StartConnect(AppState& app) {
-    if (app.state != VpnState::Idle && app.state != VpnState::Error) return;
-    app.state = VpnState::Resolving;
-    app.status_msg = "Resolving server...";
-    app.assigned_ip.clear();
-    app.t_phase_start = glfwGetTime();
-    app.Log("Connect clicked");
-}
-
-static void StartDisconnect(AppState& app) {
-    if (app.state == VpnState::Connected || app.state == VpnState::Connecting || app.state == VpnState::Resolving) {
-        app.state = VpnState::Disconnecting;
-        app.status_msg = "Disconnecting...";
-        app.t_phase_start = glfwGetTime();
-        app.Log("Disconnect clicked");
-    }
-}
-
-static void UpdateFakeState(AppState& app) {
-    const double now = glfwGetTime();
-    const double dt = now - app.t_phase_start;
-
-    switch (app.state) {
-    case VpnState::Resolving:
-        if (dt > 0.6) {
-            app.state = VpnState::Connecting;
-            app.status_msg = "Handshaking...";
-            app.t_phase_start = now;
-            app.Log("Resolved endpoint", ImVec4(0.6f, 0.9f, 0.6f, 1.0f));
-        }
-        break;
-    case VpnState::Connecting:
-        if (dt > 1.0) {
-            app.state = VpnState::Connected;
-            app.status_msg = "Connected";
-            app.assigned_ip = "10.8.0.2"; // fake assigned ip
-            app.t_phase_start = now;
-            app.Log("Tunnel established", ImVec4(0.6f, 0.9f, 0.6f, 1.0f));
-        }
-        break;
-    case VpnState::Disconnecting:
-        if (dt > 0.4) {
-            app.state = VpnState::Idle;
-            app.status_msg = "Idle";
-            app.assigned_ip.clear();
-            app.t_phase_start = now;
-            app.Log("Disconnected", ImVec4(0.9f, 0.6f, 0.6f, 1.0f));
-        }
-        break;
-    default: break; // Idle/Connected/Error: do nothing
-    }
-}
-
-// ---- UI drawing ----
-static void DrawStatusPill(const char* label, VpnState st) {
-    ImVec4 color;
-    switch (st) {
-    case VpnState::Idle: color = ImVec4(0.5f, 0.5f, 0.5f, 1.0f); break;
-    case VpnState::Resolving: color = ImVec4(0.7f, 0.7f, 0.2f, 1.0f); break;
-    case VpnState::Connecting: color = ImVec4(0.8f, 0.6f, 0.2f, 1.0f); break;
-    case VpnState::Connected: color = ImVec4(0.2f, 0.7f, 0.3f, 1.0f); break;
-    case VpnState::Disconnecting: color = ImVec4(0.7f, 0.4f, 0.2f, 1.0f); break;
-    case VpnState::Error: color = ImVec4(0.8f, 0.2f, 0.2f, 1.0f); break;
-    }
-    ImGui::PushStyleColor(ImGuiCol_Button, color);
-    ImGui::PushStyleColor(ImGuiCol_ButtonHovered, color);
-    ImGui::PushStyleColor(ImGuiCol_ButtonActive, color);
-    ImGui::Button(label);
-    ImGui::PopStyleColor(3);
-}
-
-static void DrawMainUI(AppState& app) {
-    ImGui::Begin("VPN Control", nullptr, ImGuiWindowFlags_NoCollapse);
-
-    // Top row: profile select + connect/disconnect
-    ImGui::TextUnformatted("Profile:");
-    ImGui::SameLine();
-    if (ImGui::BeginCombo("##profile", app.profiles[app.selected_profile].c_str())) {
-        for (int i = 0; i < (int)app.profiles.size(); ++i) {
-            bool sel = (i == app.selected_profile);
-            if (ImGui::Selectable(app.profiles[i].c_str(), sel)) {
-                app.selected_profile = i;
-            }
-            if (sel) ImGui::SetItemDefaultFocus();
-        }
-        ImGui::EndCombo();
-    }
-    ImGui::SameLine();
-    if (app.state == VpnState::Connected || app.state == VpnState::Connecting || app.state == VpnState::Resolving) {
-        if (ImGui::Button("Disconnect", ImVec2(120, 0))) StartDisconnect(app);
-    }
-    else {
-        if (ImGui::Button("Connect", ImVec2(120, 0))) StartConnect(app);
+int main() {
+    // ========== 初始化 GLFW ==========
+    glfwSetErrorCallback(glfw_error_callback);
+    if (!glfwInit()) {
+        std::fprintf(stderr, "Failed to init GLFW\n");
+        return EXIT_FAILURE;
     }
 
-    ImGui::Separator();
-
-    // Status line
-    ImGui::Text("Status: "); ImGui::SameLine(); DrawStatusPill(StateToText(app.state), app.state);
-    if (!app.assigned_ip.empty()) {
-        ImGui::SameLine();
-        ImGui::Text("IP: %s", app.assigned_ip.c_str());
-    }
-
-    ImGui::TextWrapped("%s", app.status_msg.c_str());
-
-    // Options
-    ImGui::Separator();
-    ImGui::Checkbox("Auto reconnect", &app.auto_reconnect);
-    ImGui::SameLine();
-    ImGui::SetNextItemWidth(120);
-    ImGui::InputInt("Interval (s)", &app.reconnect_interval_sec);
-    if (app.reconnect_interval_sec < 5) app.reconnect_interval_sec = 5;
-
-    // Log panel
-    ImGui::Separator();
-    ImGui::TextUnformatted("Logs");
-    ImGui::BeginChild("logchild", ImVec2(0, 180), true, ImGuiWindowFlags_HorizontalScrollbar);
-    for (int i = 0; i < app.logs.Size; ++i) {
-        ImGui::PushStyleColor(ImGuiCol_Text, app.log_colors[i]);
-        ImGui::TextUnformatted(app.logs[i].c_str());
-        ImGui::PopStyleColor();
-    }
-    if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
-        ImGui::SetScrollHereY(1.0f);
-    ImGui::EndChild();
-
-    if (ImGui::Button("Clear Logs")) { app.logs.clear(); app.log_colors.clear(); }
-
-    ImGui::End();
-}
-
-int main(int, char**) {// test commit from VS
-    if (!glfwInit()) return 1;
-
-    // GL + GLSL versions
-    const char* glsl_version = "#version 150"; // GL 3.2 core (safe for VS/Windows)
+    // OpenGL 上下文提示（你也可以改为 3.2 Core）
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-#if __APPLE__
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-#endif
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    // glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // 如果用 3.2+
+    // glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);           // macOS 需要
 
-    GLFWwindow* window = glfwCreateWindow(1000, 650, "Minimal VPN UI", nullptr, nullptr);
-    if (window == nullptr) return 1;
+    GLFWwindow* window = glfwCreateWindow(1280, 720, "Minimal VPN UI", nullptr, nullptr);
+    if (!window) {
+        std::fprintf(stderr, "Failed to create GLFW window\n");
+        glfwTerminate();
+        return EXIT_FAILURE;
+    }
     glfwMakeContextCurrent(window);
-    glfwSwapInterval(1);
+    glfwSwapInterval(1); // 开启垂直同步
 
+    // ========== 初始化 GLAD ==========
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+        std::fprintf(stderr, "Failed to init GLAD\n");
+        glfwDestroyWindow(window);
+        glfwTerminate();
+        return EXIT_FAILURE;
+    }
+
+    // ========== 初始化 ImGui ==========
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
-    ApplyMinimalTheme();
 
+    // 外观主题（可选）
+    ImGui::StyleColorsDark();
+
+    // 后端绑定
     ImGui_ImplGlfw_InitForOpenGL(window, true);
-    ImGui_ImplOpenGL3_Init(glsl_version);
+    ImGui_ImplOpenGL3_Init(kGlslVersion);
 
-    AppState app;
-    app.Log("App started");
+    // ========== 我们的 VPN 逻辑模型 ==========
+    static VpnModel vpn; // 界面与逻辑通过这个模型交互
 
+    // ========== 主循环 ==========
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
-        UpdateFakeState(app);
 
+        // 每帧推进一次“假后端”状态机（方案B来自 vpn_logic.h）
+        Tick(vpn);
+
+        // ---- 开始新帧（ImGui）----
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        // Main UI
-        DrawMainUI(app);
+        // 你可以自定义布局，这里只放一个简单窗口演示
+        {
+            ImGui::Begin("Minimal VPN UI");
 
+            // 标题分隔（若你的 ImGui 版本不支持 SeparatorText，可换成 Text+Separator）
+#if IMGUI_VERSION_NUM >= 18900
+            ImGui::SeparatorText("VPN Control (MVP-0)");
+#else
+            ImGui::TextUnformatted("VPN Control (MVP-0)");
+            ImGui::Separator();
+#endif
+
+            // 状态文本
+            ImGui::Text("State: %s", ToCString(vpn.state));
+
+            // 连接/断开 按钮
+            if (vpn.state == VpnState::Disconnected || vpn.state == VpnState::Failed) {
+                if (ImGui::Button("Connect")) {
+                    StartConnect(vpn);
+                }
+            }
+            else {
+                if (ImGui::Button("Disconnect")) {
+                    StartDisconnect(vpn);
+                }
+            }
+
+            ImGui::Dummy(ImVec2(0, 8));
+            ImGui::TextUnformatted("Logs");
+            ImGui::BeginChild("##vpn_logs", ImVec2(0, 200), true, ImGuiWindowFlags_NoMove);
+            for (const auto& line : vpn.logs) {
+                ImGui::TextUnformatted(line.c_str());
+            }
+            ImGui::EndChild();
+
+            ImGui::End();
+        }
+
+        // ---- 渲染提交 ----
         ImGui::Render();
-        int display_w, display_h; glfwGetFramebufferSize(window, &display_w, &display_h);
+        int display_w, display_h;
+        glfwGetFramebufferSize(window, &display_w, &display_h);
         glViewport(0, 0, display_w, display_h);
-        glClearColor(0.07f, 0.08f, 0.09f, 1.0f);
+        glClearColor(0.08f, 0.10f, 0.12f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window);
     }
 
+    // ========== 清理 ==========
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
+
     glfwDestroyWindow(window);
     glfwTerminate();
-    return 0;
+    return EXIT_SUCCESS;
 }
-
-// =============================
-// QUICK START (choose one):
-// A) If you already have ImGui+GLFW wired in VS project:
-//    - Replace your current main.cpp with this file (or call DrawMainUI(app) from your existing frame loop).
-//    - Ensure you link: glfw3dll.lib (or glfw3.lib depending static/dll), opengl32.lib
-//    - Ensure backends are compiled: imgui_impl_glfw.cpp, imgui_impl_opengl3.cpp
-//
-// B) If starting fresh with CMake+vcpkg: (optional, minimal outline)
-//    - Enable vcpkg and add packages: glfw3, imgui[glfw-binding,opengl3-binding]
-//    - Use OpenGL loader provided by the backend (no glad needed for basic UI)
-// =============================
