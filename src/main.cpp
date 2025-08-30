@@ -10,6 +10,9 @@
 #include <vector>
 #include <chrono>
 
+// ---- 我们的极简逻辑层（唯一来源）----
+#include "vpn_logic.h"            // 你之前已放在 src/vpn_logic.h
+
 // ---- OpenGL / GLFW / ImGui ----
 #include <glad/glad.h>            // 确保项目里有 src/glad.c
 #include <GLFW/glfw3.h>
@@ -19,8 +22,7 @@
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
 
-// ---- 我们的极简逻辑层（唯一来源）----
-#include "vpn_logic.h"            // 你之前已放在 src/vpn_logic.h
+
 
 // 选择一个合适的 GLSL 版本字符串
 // 如果你的环境是 OpenGL3.0/3.2，使用 "#version 130" / "#version 150" 都可
@@ -69,6 +71,29 @@ int main() {
 
     // 外观主题（可选）
     ImGui::StyleColorsDark();
+
+
+    // 保留默认英文字体（可要可不要）
+    io.Fonts->AddFontDefault();
+
+    // 加一个中文字体（任选其一，路径存在即可）
+    io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\msyh.ttc", 18.0f, nullptr,
+        io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
+    // 或者：
+    // io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\simhei.ttf", 18.0f, nullptr,
+    //                              io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
+    // io.Fonts->AddFontFromFileTTF("C:\\Windows\\Fonts\\simsun.ttc", 18.0f, nullptr,
+    //                              io.Fonts->GetGlyphRangesChineseSimplifiedCommon());
+
+    // 加载中文字体，并把它设为默认字体
+    ImFont* zh = io.Fonts->AddFontFromFileTTF(
+        "C:\\Windows\\Fonts\\msyh.ttc",   // 或 simhei.ttf / simsun.ttc
+        18.0f,
+        nullptr,
+        io.Fonts->GetGlyphRangesChineseSimplifiedCommon()
+    );
+    io.FontDefault = zh;  // 关键：让中文字体成为默认字体
+
 
     // 后端绑定
     ImGui_ImplGlfw_InitForOpenGL(window, true);

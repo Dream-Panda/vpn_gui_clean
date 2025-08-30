@@ -234,6 +234,7 @@ imm32.lib
     <ClCompile Include="..\src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\process_runner.h" />
     <ClInclude Include="..\src\vpn_logic.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
