@@ -95,6 +95,8 @@
       <AdditionalOptions>/utf-8
 </AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <AdditionalIncludeDirectories>E:\VS2022\OpenGL_Project\src\core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -130,6 +132,8 @@ imm32.lib
       <AdditionalOptions>/utf-8
 </AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <AdditionalIncludeDirectories>E:\VS2022\OpenGL_Project\src\core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -163,6 +167,8 @@ imm32.lib
       <AdditionalOptions>/utf-8
 </AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <AdditionalIncludeDirectories>E:\VS2022\OpenGL_Project\src\core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -198,6 +204,8 @@ imm32.lib
       <AdditionalOptions>/utf-8
 </AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <AdditionalIncludeDirectories>E:\VS2022\OpenGL_Project\src\core;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -230,10 +238,12 @@ imm32.lib
     <ClCompile Include="..\external\imgui\imgui_draw.cpp" />
     <ClCompile Include="..\external\imgui\imgui_tables.cpp" />
     <ClCompile Include="..\external\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="..\src\core\ProcessRunner.cpp" />
     <ClCompile Include="..\src\glad.c" />
     <ClCompile Include="..\src\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\core\ProcessRunner.h" />
     <ClInclude Include="..\src\process_runner.h" />
     <ClInclude Include="..\src\vpn_logic.h" />
   </ItemGroup>

@@ -42,12 +42,18 @@
     <ClCompile Include="..\external\imgui\imgui_demo.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\core\ProcessRunner.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\vpn_logic.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\src\process_runner.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\core\ProcessRunner.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
