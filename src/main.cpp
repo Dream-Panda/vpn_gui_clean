@@ -27,13 +27,11 @@ static int g_Width = 1280, g_Height = 720;
 // VPN globals
 static OpenVpnRunner g_vpn;
 static LogBuffer     g_log;
+
 static OpenVpnConfig g_cfg{
-    /* openvpnExe */ "C:/Program Files/OpenVPN/bin/openvpn.exe",
-    /* ovpnFile   */ "C:/Users/Panda Dream 2024/Downloads/jp-tok.prod.surfshark.comsurfshark_openvpn_tcp.ovpn",  // ← 改成你的 .ovpn 绝对路径
-    /* workDir    */ "C:/vpn/temp",                // ← 需要可写
-    /* authUser   */ "",                           // ← 若需要用户名密码，填这里
-    /* authPass   */ "",
-    /* verb       */ 3
+    L"C:/Program Files/OpenVPN/bin/openvpn.exe",
+    L"C:/Users/Panda Dream 2024/Downloads/jp-tok.prod.surfshark.comsurfshark_openvpn_tcp.ovpn",  // ← 改成你的 .ovpn 绝对路径
+    {},
 };
 
 // --------------- Helpers ----------------

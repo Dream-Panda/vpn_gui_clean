@@ -1,3 +1,4 @@
+// src/ui/Panels.h  —— 覆盖
 #pragma once
 #include <functional>
 #include <string>
@@ -6,6 +7,9 @@
 struct LogBuffer {
     std::vector<std::string> lines;
     void add(const std::string& s) { lines.push_back(s); if (lines.size() > 2000) lines.erase(lines.begin()); }
+    // 兼容你 main.cpp 里的用法
+    void clear() { lines.clear(); }
+    void push(const std::string& s) { add(s); }
 };
 
 class UiPanels {

@@ -56,11 +56,12 @@ add_executable(${PROJECT_NAME} ${SRC_FILES})
 add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/utf-8>)
 
 # 把新添的实现文件编进目标，解决 LNK2019
-target_sources(VPN_GUI_OpenGL PRIVATE
+target_sources(${PROJECT_NAME} PRIVATE
     src/ui/Panels.cpp
     src/vpn/OpenVpnRunner.cpp
     src/vpn/ProcessRunner.cpp
 )
+
 
 
 # 头文件可见
