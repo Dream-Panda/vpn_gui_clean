@@ -1,50 +1,21 @@
 #pragma once
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
 #include <windows.h>
 #include <string>
-#include <atomic>
-#include <mutex>
-#include <thread>
-#include <vector>
+#include "ProcessOptions.h"
 
 class ProcessRunner {
 public:
     ProcessRunner();
     ~ProcessRunner();
 
-    // exePath/args/workingDir are wide strings.
-    bool Start(const std::wstring& exePath,
-        const std::wstring& args = L"",
-        const std::wstring& workingDir = L"");
-    void Stop(bool force = true, unsigned killTimeoutMs = 1500);
-    bool IsRunning() const { return running_; }
-
-    // Return newly appended output as UTF-8.
-    std::string ConsumeNewOutput();
-    void ClearLog();
+    bool start(const ProcessOptions& opt, std::wstring* lastError = nullptr);
+    void stop(DWORD exitCode = 0);
+    bool running() const;
+    DWORD pid() const { return pi_.dwProcessId; }
 
 private:
-    void ReaderThreadProc_(HANDLE readHandle);
-    void WaitThreadProc_(HANDLE hProcess);
-    static bool MakePipe_(HANDLE& hRead, HANDLE& hWrite, bool writeInheritable);
-    static std::wstring QuoteIfNeeded_(const std::wstring& s);
-    static std::string BytesToUtf8Fallback_(const char* data, size_t n);
-
-private:
-    std::atomic<bool> running_{ false };
-    std::atomic<bool> stopRequested_{ false };
-
-    HANDLE hProcess_{ nullptr };
-    HANDLE hThread_{ nullptr };
-
-    HANDLE hStdOutR_{ nullptr }, hStdOutW_{ nullptr };
-    HANDLE hStdErrR_{ nullptr }, hStdErrW_{ nullptr };
-
-    std::thread tOut_, tErr_, tWait_;
-
-    std::mutex logMtx_;
-    std::string logBuf_;
-    size_t consumed_{ 0 };
+    PROCESS_INFORMATION pi_{};
+    HANDLE job_{ nullptr };
+    static std::wstring buildCmdLine(const ProcessOptions& opt);
+    static void closeHandleSafe(HANDLE& h);
 };

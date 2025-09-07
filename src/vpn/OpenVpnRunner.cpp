@@ -1,38 +1,30 @@
 #include "OpenVpnRunner.h"
-#include <fstream>
+#include <codecvt>
+#include <locale>
 
-static std::string q(const std::string& s) { return "\"" + s + "\""; }
+static std::wstring widen(const std::string& s) {
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> cv; return cv.from_bytes(s);
+}
+static std::string narrow(const std::wstring& w) {
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> cv; return cv.to_bytes(w);
+}
 
-bool OpenVpnRunner::start(const OpenVpnConfig& cfg, LogCallback cb) {
-    if (running_) return false;
-
+bool OpenVpnRunner::start(const OpenVpnConfig& cfg,
+    std::function<void(const std::string&)> onOutput,
+    std::function<void(const std::string&)> /*onError*/) {
     ProcessOptions opt;
-    opt.exePath = cfg.openvpnExe;
-    opt.workDir = cfg.workDir;
+    opt.exe = cfg.openvpnExe;
+    opt.args = { L"--config", cfg.ovpnFile, L"--verb", L"3" };
+    for (auto& a : cfg.extraArgs) opt.args.push_back(a);
+    opt.hidden = true;
 
-    std::vector<std::string> args = { "--config", q(cfg.ovpnFile), "--verb", std::to_string(cfg.verb) };
-
-    std::string authFile;
-    if (!cfg.authUser.empty() || !cfg.authPass.empty()) {
-        authFile = cfg.workDir + "/auth.txt";
-        std::ofstream f(authFile, std::ios::binary);
-        f << cfg.authUser << "\n" << cfg.authPass << "\n";
-        f.close();
-        args.push_back("--auth-user-pass");
-        args.push_back(q(authFile));
-    }
-    opt.args = std::move(args);
-
-    bool ok = pr_.start(opt,
-        [cb](const std::string& line) { if (cb) cb(line); },
-        [cb](const std::string& line) { if (cb) cb(std::string("[ERR] ") + line); }
-    );
-    running_ = ok;
+    std::wstring err;
+    bool ok = runner_.start(opt, &err);
+    if (!ok && onOutput) { onOutput(narrow(L"[OpenVPN] start failed: " + err)); }
+    else if (ok && onOutput) { onOutput("[OpenVPN] started"); }
     return ok;
 }
 
 void OpenVpnRunner::stop() {
-    if (!running_) return;
-    pr_.stop();
-    running_ = false;
+    runner_.stop();
 }

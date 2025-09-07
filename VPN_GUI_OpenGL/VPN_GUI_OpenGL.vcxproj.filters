@@ -45,6 +45,12 @@
     <ClCompile Include="..\src\vpn\ProcessRunner.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\vpn\OpenVpnRunner.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ui\Panels.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\src\vpn_logic.h">
@@ -54,6 +60,15 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\src\core\ProcessRunner.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\vpn\ProcessOptions.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\vpn\OpenVpnRunner.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ui\Panels.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

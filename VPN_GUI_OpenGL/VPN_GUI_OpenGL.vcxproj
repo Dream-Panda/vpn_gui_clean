@@ -238,6 +238,8 @@ imm32.lib
     <ClCompile Include="..\external\imgui\imgui_draw.cpp" />
     <ClCompile Include="..\external\imgui\imgui_tables.cpp" />
     <ClCompile Include="..\external\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="..\src\ui\Panels.cpp" />
+    <ClCompile Include="..\src\vpn\OpenVpnRunner.cpp" />
     <ClCompile Include="..\src\vpn\ProcessRunner.cpp" />
     <ClCompile Include="..\src\glad.c" />
     <ClCompile Include="..\src\main.cpp" />
@@ -245,6 +247,9 @@ imm32.lib
   <ItemGroup>
     <ClInclude Include="..\src\core\ProcessRunner.h" />
     <ClInclude Include="..\src\process_runner.h" />
+    <ClInclude Include="..\src\ui\Panels.h" />
+    <ClInclude Include="..\src\vpn\OpenVpnRunner.h" />
+    <ClInclude Include="..\src\vpn\ProcessOptions.h" />
     <ClInclude Include="..\src\vpn_logic.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

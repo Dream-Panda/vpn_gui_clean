@@ -1,23 +1,16 @@
 #pragma once
+#include <functional>
 #include <string>
-#include <deque>
-#include <mutex>
+#include <vector>
 
 struct LogBuffer {
-    std::deque<std::string> lines;
-    std::mutex mtx;
-    void push(const std::string& s) {
-        std::scoped_lock lk(mtx);
-        lines.push_back(s);
-        if (lines.size() > 2000) lines.pop_front();
-    }
-    void clear() {
-        std::scoped_lock lk(mtx);
-        lines.clear();
-    }
+    std::vector<std::string> lines;
+    void add(const std::string& s) { lines.push_back(s); if (lines.size() > 2000) lines.erase(lines.begin()); }
 };
 
-namespace UiPanels {
-    void DrawVpnControls(bool running, std::function<void()> onStart, std::function<void()> onStop);
-    void DrawLogs(LogBuffer& buf);
-}
+class UiPanels {
+public:
+    void DrawUI();
+    void DrawVpnControls(bool connected, std::function<void()> onStart, std::function<void()> onStop);
+    void DrawLogs(LogBuffer& log);
+};

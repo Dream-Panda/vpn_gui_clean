@@ -1,27 +1,25 @@
 #include "Panels.h"
-#include <imgui.h>
+#include "imgui.h"
 
-void UiPanels::DrawVpnControls(bool running, std::function<void()> onStart, std::function<void()> onStop) {
+void UiPanels::DrawUI() {
     ImGui::Begin("VPN");
-    ImGui::Text("Status: %s", running ? "Running" : "Stopped");
-    if (!running) {
-        if (ImGui::Button("Start OpenVPN")) { if (onStart) onStart(); }
+    ImGui::TextUnformatted("VPN GUI (minimal)");
+    ImGui::End();
+}
+
+void UiPanels::DrawVpnControls(bool connected, std::function<void()> onStart, std::function<void()> onStop) {
+    ImGui::Begin("Controls");
+    if (!connected) {
+        if (ImGui::Button("Start VPN") && onStart) onStart();
     }
     else {
-        if (ImGui::Button("Stop OpenVPN")) { if (onStop) onStop(); }
+        if (ImGui::Button("Stop VPN") && onStop) onStop();
     }
     ImGui::End();
 }
 
-void UiPanels::DrawLogs(LogBuffer& buf) {
+void UiPanels::DrawLogs(LogBuffer& log) {
     ImGui::Begin("Logs");
-    ImGui::BeginChild("logscroll", ImVec2(0, 0), true, ImGuiWindowFlags_HorizontalScrollbar);
-    {
-        std::scoped_lock lk(buf.mtx);
-        for (auto& l : buf.lines) ImGui::TextUnformatted(l.c_str());
-        if (ImGui::GetScrollY() >= ImGui::GetScrollMaxY())
-            ImGui::SetScrollHereY(1.0f);
-    }
-    ImGui::EndChild();
+    for (auto& s : log.lines) ImGui::TextUnformatted(s.c_str());
     ImGui::End();
 }

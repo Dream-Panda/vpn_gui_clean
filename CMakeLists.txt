@@ -52,6 +52,17 @@ endforeach()
 
 add_executable(${PROJECT_NAME} ${SRC_FILES})
 
+# 统一 MSVC 源文件编码为 UTF-8，消除 C4828 警告
+add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/utf-8>)
+
+# 把新添的实现文件编进目标，解决 LNK2019
+target_sources(VPN_GUI_OpenGL PRIVATE
+    src/ui/Panels.cpp
+    src/vpn/OpenVpnRunner.cpp
+    src/vpn/ProcessRunner.cpp
+)
+
+
 # 头文件可见
 target_include_directories(${PROJECT_NAME} PRIVATE
     ${CMAKE_SOURCE_DIR}/src

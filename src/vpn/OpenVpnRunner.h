@@ -1,27 +1,23 @@
 #pragma once
-#include "vpn/ProcessRunner.h"
-#include <string>
 #include <functional>
-#include <atomic>
+#include <string>
+#include <vector>
+#include "ProcessRunner.h"
 
 struct OpenVpnConfig {
-    std::string openvpnExe;   // e.g. C:/Program Files/OpenVPN/bin/openvpn.exe
-    std::string ovpnFile;     // e.g. C:/vpn/profiles/my.ovpn
-    std::string workDir;      // e.g. C:/vpn/temp
-    std::string authUser;     // 可选
-    std::string authPass;     // 可选
-    int verb = 3;             // 日志级别(3~6常用)
+    std::wstring openvpnExe;     // openvpn.exe 路径
+    std::wstring ovpnFile;       // 配置文件路径
+    std::vector<std::wstring> extraArgs; // 额外参数
 };
 
 class OpenVpnRunner {
 public:
-    using LogCallback = std::function<void(const std::string&)>;
-
-    bool start(const OpenVpnConfig& cfg, LogCallback cb);
+    bool start(const OpenVpnConfig& cfg,
+        std::function<void(const std::string&)> onOutput = {},
+        std::function<void(const std::string&)> onError = {});
     void stop();
-    bool running() const { return running_; }
+    bool running() const { return runner_.running(); }
 
 private:
-    ProcessRunner pr_;
-    std::atomic<bool> running_{ false };
+    ProcessRunner runner_;
 };
