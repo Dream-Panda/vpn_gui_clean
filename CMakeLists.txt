@@ -50,17 +50,26 @@ foreach(f IN LISTS IMGUI_SOURCES)
     endif()
 endforeach()
 
+
+
+# 统一 UTF-8（保留）
+add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/utf-8>)
+
+# ★ 追加到 SRC_FILES（注意使用 ${CMAKE_SOURCE_DIR} 绝对化路径）
+list(APPEND SRC_FILES
+    ${CMAKE_SOURCE_DIR}/src/ui/Panels.cpp
+    ${CMAKE_SOURCE_DIR}/src/vpn/OpenVpnRunner.cpp
+    ${CMAKE_SOURCE_DIR}/src/vpn/ProcessRunner.cpp
+)
+
+
+
 add_executable(${PROJECT_NAME} ${SRC_FILES})
 
 # 统一 MSVC 源文件编码为 UTF-8，消除 C4828 警告
 add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/utf-8>)
 
-# 把新添的实现文件编进目标，解决 LNK2019
-target_sources(${PROJECT_NAME} PRIVATE
-    src/ui/Panels.cpp
-    src/vpn/OpenVpnRunner.cpp
-    src/vpn/ProcessRunner.cpp
-)
+
 
 
 
